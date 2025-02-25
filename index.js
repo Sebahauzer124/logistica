@@ -6,7 +6,7 @@ const XLSX = require('xlsx');
 const Handlebars = require('handlebars'); // Importa Handlebars
 
 const app = express();
-
+const port = process.env.PORT || 3000;
 Handlebars.registerHelper('neq', function(a, b) {
   // Comparar a y b directamente
   return a !== b ? true : false; // Devuelve true o false dependiendo de si son diferentes
@@ -105,6 +105,6 @@ app.get('/', (req, res) => {
 });
 
 // Iniciar el servidor
-app.listen(3000, () => {
+app.listen(port, () => {
   console.log('Servidor iniciado en http://localhost:3000');
 });
