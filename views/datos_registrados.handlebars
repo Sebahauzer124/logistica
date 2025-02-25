@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registro de Datos</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f4;
+      color:   #333;
+    }
+
+    h1 {
+      text-align: center;
+      color: #2a2a2a;
+    }
+
+    h2 {
+      color: #333;
+      margin-top: 20px;
+      border-bottom: 2px solid #ccc;
+      padding-bottom: 5px;
+    }
+
+    p {
+      font-size: 1.1rem;
+      margin: 5px 0;
+    }
+
+    .container {
+      width: 95%;
+      max-width: 650px;
+      margin: 10px auto;
+      background-color: #fff;
+      padding: 10px;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+.table-container {
+  width: 100%; /* O ajusta el porcentaje según el tamaño que quieras */
+  padding: 10px;
+  box-sizing: border-box; /* Asegura que el padding no sume al ancho */
+  overflow-x: auto; /* Permite el desbordamiento horizontal si el contenido es demasiado ancho */
+}
+.table-container table td, 
+.table-container table th {
+  font-size: 12px; /* Ajusta el tamaño según lo que necesites */
+}
+
+
+    table {
+      width: 70%;
+      border-collapse: collapse;
+      
+    }
+
+    th,
+    td {
+      text-align: center;
+      padding: 8px;
+      border: 1px solid #ddd;
+    }
+
+    th {
+      background-color: #f0f0f0;
+      font-weight: bold;
+    }
+
+    td {
+      background-color: #fafafa;
+    }
+
+    @media print {
+      body {
+        background: none;
+      }
+
+      .container {
+        box-shadow: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>Registro de Datos</h1>
+
+    {{#if date}}<p><strong>Fecha:</strong> {{date}}</p>{{/if}}
+    {{#if (neq chofer1 'Seleccione el chofer/acompañante')}}
+    <p><strong>Chofer 1:</strong> {{chofer1}}</p>
+    {{/if}}
+
+    {{#if (neq chofer2 'Seleccione el chofer/acompañante')}}
+    <p><strong>Chofer 2:</strong> {{chofer2}}</p>
+    {{/if}}
+
+    {{#if (neq chofer3 'Seleccione el chofer/acompañante')}}
+    <p><strong>Chofer 3:</strong> {{chofer3}}</p>
+    {{/if}}
+
+    {{#if totalManual}}<p><strong>Total Contado</strong> {{totalManual}}</p>{{/if}}
+    {{#if total}}<p><strong>Total a Rendir</strong> {{total}}</p>{{/if}}
+    {{#if totalValores}}<p><strong>Total valor </strong> {{totalValores}}</p>{{/if}}
+    {{#if diferencia}}<p><strong>Diferencia:</strong> {{diferencia}}</p>{{/if}}
+    {{#if comentarios}}<p><strong>Comentarios</strong> {{comentarios}}</p>{{/if}}
+    <!-- Venta de Envases -->
+    {{#if envases.length}}
+    <h2>📦 Venta de Envases</h2>
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th></th>
+            <th>Producto</th>
+            <th>Precio</th>
+            <th>Cantidad</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each envases}}
+           
+             
+                {{#if product}}
+                  {{#if price}}
+                    {{#if quantity}}
+                      {{#if total}}
+                        <tr>
+                          <td>{{pdv}}</td>
+                          <td>{{product}}</td>
+                          <td>{{price}}</td>
+                          <td>{{quantity}}</td>
+                          <td>{{total}}</td>
+                        </tr>
+                      {{/if}}
+                    {{/if}}
+                  {{/if}}
+                {{/if}}
+             
+          {{/each}}
+        </tbody>
+      </table>
+    </div>
+    {{/if}}
+
+    <!-- Devoluciones Parciales -->
+    {{#if partialReturns.length}}
+    <h2>🔄 Devoluciones Parciales</h2>
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>PDV</th>
+            <th>Producto</th>
+            <th>Cantidad</th>
+            <th>Motivo</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each partialReturns}}
+          {{#if pdv}}{{#if product}}{{#if quantity}}{{#if total}}<tr>
+            <td>{{pdv}}</td>
+            <td>{{product}}</td>
+            <td>{{quantity}}</td>
+            <td>{{total}}</td>
+            <td>{{motivo}}</td>
+          </tr>{{/if}}{{/if}}{{/if}}{{/if}}
+          {{/each}}
+        </tbody>
+      </table>
+    </div>
+    {{/if}}
+
+    <!-- Rotos -->
+    {{#if breaks.length}}
+    <h2>🚨 Rotos</h2>
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>PDV</th>
+            <th>Producto</th>
+            <th>Cantidad</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each breaks}}
+          {{#if pdv}}{{#if product}}{{#if quantity}}{{#if total}}<tr>
+            <td>{{pdv}}</td>
+            <td>{{product}}</td>
+            <td>{{quantity}}</td>
+            <td>{{total}}</td>
+          </tr>{{/if}}{{/if}}{{/if}}{{/if}}
+          {{/each}}
+        </tbody>
+      </table>
+    </div>
+    {{/if}}
+
+    <!-- Devoluciones Totales -->
+    {{#if totalReturns.length}}
+    <h2>✅ Devoluciones Totales</h2>
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>PDV</th>
+            <th>Total</th>
+            <th>Motivo</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each totalReturns}}
+          {{#if pdv}}{{#if total}}<tr>
+            <td>{{pdv}}</td>
+            <td>{{total}}</td>
+            <td>{{motivo}}</td>
+          </tr>{{/if}}{{/if}}
+          {{/each}}
+        </tbody>
+      </table>
+    </div>
+    {{/if}}
+
+    <!-- Saldo a favor -->
+    {{#if saldo.length}}
+    <h2> Cambios no realizados</h2>
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>PDV</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each saldo}}
+          {{#if pdv}}{{#if total}}<tr>
+            <td>{{pdv}}</td>
+            <td>{{total}}</td>
+          </tr>{{/if}}{{/if}}
+          {{/each}}
+        </tbody>
+      </table>
+    </div>
+    {{/if}}
+
+   {{#if facturaCuentaCorriente.length}}
+    <h2> Factura a cuenta corriente</h2>
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>PDV</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each facturaCuentaCorriente}}
+          {{#if pdv}}{{#if total}}<tr>
+            <td>{{pdv}}</td>
+            <td>{{total}}</td>
+          </tr>{{/if}}{{/if}}
+          {{/each}}
+        </tbody>
+      </table>
+    </div>
+    {{/if}}
+
+    <!-- Cheques -->
+    {{#if cheques.length}}
+    <h2>💳 Cheques</h2>
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>PDV</th>
+            <th>Número</th>
+            <th>Fecha</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each cheques}}
+          {{#if pdv}}{{#if date}}{{#if total}}<tr>
+            <td>{{pdv}}</td>
+            <td>{{num}}</td>
+            <td>{{date}}</td>
+            <td>{{total}}</td>
+          </tr>{{/if}}{{/if}}{{/if}}
+          {{/each}}
+        </tbody>
+      </table>
+    </div>
+    {{/if}}
+
+    <!-- Transferencias -->
+    {{#if transfers.length}}
+    <h2>🔁 Transferencias</h2>
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>PDV</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each transfers}}
+          {{#if pdv}}{{#if total}}<tr>
+            <td>{{pdv}}</td>
+            <td>{{total}}</td>
+          </tr>{{/if}}{{/if}}
+          {{/each}}
+        </tbody>
+      </table>
+    </div>
+    {{/if}}
+
+    <!-- Billetes -->
+    {{#if bills.length}}
+    <h2>💵 Billetes</h2>
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Billete</th>
+            <th>Cantidad</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each bills}}
+          {{#if bill}}{{#if quantity}}{{#if total}}<tr>
+            <td>{{bill}}</td>
+            <td>{{quantity}}</td>
+            <td>{{total}}</td>
+          </tr>{{/if}}{{/if}}{{/if}}
+          {{/each}}
+        </tbody>
+      </table>
+    </div>
+    {{/if}}
+
+    <!---gastos--->
+  {{#if gastos.length}}
+    <h2>💵 Gastos</h2>
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Motivo</th>
+            <th>Importe</th>
+                   </tr>
+        </thead>
+        <tbody>
+          {{#each gastos}}
+          {{#if motivo}}{{#if total}}<tr>
+            <td>{{motivo}}</td>
+            <td>{{total}}</td>
+          </tr>{{/if}}{{/if}}
+          {{/each}}
+        </tbody>
+      </table>
+    </div>
+    {{/if}}
+
+
+
+<button id="downloadPdf" class="btn btn-primary">Descargar PDF</button>
+  </div>
+  
+  <script>
+document.getElementById("downloadPdf").addEventListener("click", function() {
+  const { jsPDF } = window.jspdf;
+  let doc = new jsPDF();
+
+  html2canvas(document.querySelector(".container"), { scale: 1 }).then(canvas => {
+    // Convertir la imagen a JPEG con calidad del 60% en lugar de PNG para reducir tamaño
+    let imgData = canvas.toDataURL("image/jpeg", 0.6);
+
+    const pageWidth = doc.internal.pageSize.width;
+    const pageHeight = doc.internal.pageSize.height;
+
+    // Ajustar el ancho de la imagen para aprovechar más el espacio horizontal (un 30% más ancho)
+    const imgWidth = (pageWidth - 20) * 1.7;  
+    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+    // Verificar si la imagen es demasiado alta para una página y ajustarla
+    if (imgHeight > pageHeight - 20) {
+      const scaleFactor = (pageHeight - 20) / imgHeight;
+      doc.addImage(imgData, "JPEG", 10, 10, imgWidth * scaleFactor, imgHeight * scaleFactor);
+    } else {
+      doc.addImage(imgData, "JPEG", 10, 10, imgWidth, imgHeight);
+    }
+
+    // Descargar el PDF
+    doc.save("compra_envases.pdf");
+  }).catch(function(error) {
+    console.error("Error al generar el PDF:", error);
+  });
+});
+</script>
+
+
+
+</body>
+
+</html>

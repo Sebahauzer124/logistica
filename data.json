@@ -1,0 +1,82 @@
+{
+  "date": "2025-02-25",
+  "chofer1": "Seleccione el chofer/acompañante",
+  "chofer2": "Seleccione el chofer/acompañante",
+  "chofer3": "Seleccione el chofer/acompañante",
+  "totalManual": "5555",
+  "total": "5555",
+  "totalValores": "0",
+  "diferencia": "-5555",
+  "envases": [
+    {
+      "product": "2730-Q PILAS 1/3",
+      "price": "10000",
+      "quantity": "",
+      "total": ""
+    }
+  ],
+  "breaks": [
+    {
+      "pdv": "Seleccione - el PDV",
+      "product": "",
+      "quantity": "",
+      "total": ""
+    }
+  ],
+  "partialReturns": [
+    {
+      "pdv": "Seleccione - el PDV",
+      "product": "",
+      "quantity": "",
+      "total": "",
+      "motivo": "ELIGE EL MOTIVO"
+    }
+  ],
+  "totalReturns": [
+    {
+      "pdv": "Seleccione - el PDV",
+      "motivo": "ELIGE EL MOTIVO",
+      "total": ""
+    }
+  ],
+  "saldo": [
+    {
+      "pdv": "Seleccione - el PDV",
+      "total": ""
+    }
+  ],
+  "facturaCuentaCorriente": [
+    {
+      "pdv": "Seleccione - el PDV",
+      "total": ""
+    }
+  ],
+  "cheques": [
+    {
+      "pdv": "Seleccione - el PDV",
+      "date": "",
+      "num": "",
+      "total": ""
+    }
+  ],
+  "transfers": [
+    {
+      "pdv": "Seleccione - el PDV",
+      "total": ""
+    }
+  ],
+  "bills": [
+    {
+      "bill": "",
+      "quantity": "",
+      "total": ""
+    }
+  ],
+  "gastos": [
+    {
+      "motivo": "",
+      "total": ""
+    }
+  ],
+  "comentarios": "a la majo por el chiquito"
+}

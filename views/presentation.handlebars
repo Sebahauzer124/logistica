@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <title>{{title}}</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js"></script>
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+  <div class="container">
+    <h1 class="my-4">{{title}}</h1>
+    <form action="/submit" method="post">
+      <!-- Fecha y Choferes -->
+      <div class="form-group">
+        <label for="date">Fecha:</label>
+        <input type="date" class="form-control" id="date" name="date" required>
+      </div>
+
+      <div class="form-group">
+        <label for="chofer1">Seleccionar Chofer 1:</label>
+        <select name="chofer1" id="chofer1">
+          {{#each choferes}}
+          <option value="{{this.name}}">{{this.name}} - {{this.type}}</option>
+          {{/each}}
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="chofer2">Seleccionar Chofer 2:</label>
+        <select name="chofer2" id="chofer2">
+          {{#each choferes}}
+          <option value="{{this.name}}">{{this.name}} - {{this.type}}</option>
+          {{/each}}
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="chofer3">Seleccionar Chofer 3:</label>
+        <select name="chofer3" id="chofer3">
+          {{#each choferes}}
+          <option value="{{this.name}}">{{this.name}} - {{this.type}}</option>
+          {{/each}}
+        </select>
+      </div>
+
+      <!-- Totales -->
+      <div class="form-group">
+        <label for="total">Total a Rendir:</label>
+        <input type="number" class="form-control" id="total" name="total" readonly>
+      </div>
+
+      <div class="form-group">
+        <label for="totalManual">Total a Rendir Manual:</label>
+        <input type="number" class="form-control" id="totalManual" name="totalManual" oninput="calcularDiferencia()" required>
+      </div>
+
+      <div class="form-group">
+        <label for="diferencia">Diferencia:</label>
+        <input type="number" class="form-control" id="diferencia" name="diferencia" readonly>
+      </div>
+
+      <!-- Compra de envases -->
+      <fieldset>
+        <legend>Compra de envases</legend>
+        <table class="table" id="envasesTable">
+          <thead>
+            <tr>
+              <th>PDV</th>
+              <th>Producto</th>
+              <th>Precio</th>
+              <th>Cantidad</th>
+              <th>Total</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="envase-row">
+              <td>
+                <select name="envases[0][pdv]" id="envases-pdv">
+                  {{#each clientes}}
+                  <option value="{{this.displayName}}">{{this.codigo}} - {{this.razonSocial}}</option>
+                  {{/each}}
+                </select>
+              </td>
+              <td>
+                <select name="envases[0][product]" class="form-control" onchange="updatePrice(0)">
+                  <option value="2730-Q PILAS 1/3" data-price="10000">2730-Q PILAS 1/3</option>
+                  <option value="2731-Q CERVEZAS 1/1" data-price="25600.01">2731-Q CERVEZAS 1/1</option>
+                  <option value="2754-ENV BARR 20L" data-price="30728.52">2754-ENV BARR 20L</option>
+                  <option value="2755-ENV BARR 50L VACIO" data-price="51214.19">2755-ENV BARR 50L VACIO</option>
+                  <option value="2776 BOT 1/1 ARACELI 1000CC " data-price="991.76">2776 BOT 1/1 ARACELI 1000CC </option>
+                  <option value="2780-BOT AMBAR 340 RET" data-price="9600">2780-BOT AMBAR 340 RET</option>
+                  <option value="5192 BOT 2L RECO " data-price="101">5192 BOT 2L RECO X 8</option>
+                </select>
+              </td>
+              <td>
+                <input type="number" name="envases[0][price]" class="form-control" value="10000" readonly>
+              </td>
+              <td>
+                <input type="number" name="envases[0][quantity]" class="form-control quantity" onchange="updateTotal(0)">
+              </td>
+              <td>
+                <input type="number" name="envases[0][total]" class="form-control total" readonly>
+              </td>
+              <td>
+                <button type="button" class="btn btn-danger delete-row">Eliminar</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <button type="button" class="btn btn-primary addRow" data-table="envasesTable">Agregar compra de envases</button>
+      </fieldset>
+
+      <!-- Roturas -->
+      <fieldset>
+        <legend>Roturas</legend>
+        <table class="table" id="breaksTable">
+          <thead>
+            <tr>
+              <th>PDV</th>
+              <th>Producto</th>
+              <th>Cantidad</th>
+              <th>Total por Rotura</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="break-row">
+              <td>
+                <select name="breaks[0][pdv]" id="breaks-pdv">
+                  {{#each clientes}}
+                  <option value="{{this.displayName}}">{{this.codigo}} - {{this.razonSocial}}</option>
+                  {{/each}}
+                </select>
+              </td>
+              <td><input type="text" name="breaks[0][product]" class="form-control"></td>
+              <td><input type="number" name="breaks[0][quantity]" class="form-control quantity"></td>
+              <td><input type="number" name="breaks[0][total]" class="form-control" onchange="calcularTotales()"></td>
+              <td><button type="button" class="btn btn-danger delete-row">Eliminar</button></td>
+            </tr>
+          </tbody>
+        </table>
+        <button type="button" class="btn btn-primary addRow" data-table="breaksTable">Agregar Rotura</button>
+      </fieldset>
+
+      <!-- Devoluciones Parciales -->
+      <fieldset>
+        <legend>Devoluciones Parciales</legend>
+        <table class="table" id="partialReturnsTable">
+          <thead>
+            <tr>
+              <th>PDV</th>
+              <th>Producto</th>
+              <th>Cantidad</th>
+              <th>Total por Devolución</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="partial-return-row">
+              <td>
+                <select name="partialReturns[0][pdv]" id="partialReturns-pdv">
+                  {{#each clientes}}
+                  <option value="{{this.displayName}}">{{this.codigo}} - {{this.razonSocial}}</option>
+                  {{/each}}
+                </select>
+              </td>
+              <td><input type="text" name="partialReturns[0][product]" class="form-control"></td>
+              <td><input type="number" name="partialReturns[0][quantity]" class="form-control quantity"></td>
+              <td><input type="number" name="partialReturns[0][total]" class="form-control" onchange="calcularTotales()"></td>
+              <td><button type="button" class="btn btn-danger delete-row">Eliminar</button></td>
+            </tr>
+          </tbody>
+        </table>
+        <button type="button" class="btn btn-primary addRow" data-table="partialReturnsTable">Agregar Devolución Parcial</button>
+      </fieldset>
+
+      <!-- Devoluciones Totales -->
+      <fieldset>
+        <legend>Devoluciones Totales</legend>
+        <table class="table" id="totalReturnsTable">
+          <thead>
+            <tr>
+              <th>PDV</th>
+              <th>Total Devolución</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="total-return-row">
+              <td>
+                <select name="totalReturns[0][pdv]" id="totalReturns-pdv">
+                  {{#each clientes}}
+                  <option value="{{this.displayName}}">{{this.codigo}} - {{this.razonSocial}}</option>
+                  {{/each}}
+                </select>
+              </td>
+              <td><input type="number" name="totalReturns[0][total]" class="form-control" onchange="calcularTotales()"></td>
+              <td><button type="button" class="btn btn-danger delete-row">Eliminar</button></td>
+            </tr>
+          </tbody>
+        </table>
+        <button type="button" class="btn btn-primary addRow" data-table="totalReturnsTable">Agregar Devolución Total</button>
+      </fieldset>
+
+      <!-- Button to Capture -->
+      <div class="form-group">
+        <button type="button" class="btn btn-success" id="captureButton">Capturar</button>
+      </div>
+    </form>
+  </div>
+
+  <script src="scripts.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <title>{{title}}</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js"></script>
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+   <div class="container">
+    <h1 class="my-4">{{title}}</h1>
+    <form action="/submit" method="post">
+      <!-- Fecha y total -->
+      <div class="form-group">
+        <label for="date">Fecha:</label>
+        <input type="date" class="form-control" id="date" name="date" required>
+      </div>
+      <div class="form-group">
+        <label for="total">Total a Rendir:</label>
+        <input type="number" class="form-control" id="total" name="total" readonly>
+      </div>
+      <div class="form-group">
+        <label for="totalManual">Total a Rendir Manual:</label>
+        <input type="number" class="form-control" id="totalManual" name="totalManual" oninput="calcularDiferencia()" required>
+      </div>
+      <div class="form-group">
+        <label for="diferencia">Diferencia:</label>
+        <input type="number" class="form-control" id="diferencia" name="diferencia" readonly>
+      </div>
+
+      <!-- Choferes -->
+      <div class="form-group">
+        <label for="chofer1">Seleccionar Chofer 1:</label>
+        <select name="chofer1" id="chofer1">
+          {{#each choferes}}
+          <option value="{{this.name}}">{{this.name}} - {{this.type}}</option>
+          {{/each}}
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="chofer2">Seleccionar Chofer 2:</label>
+        <select name="chofer2" id="chofer2">
+          {{#each choferes}}
+          <option value="{{this.name}}">{{this.name}} - {{this.type}}</option>
+          {{/each}}
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="chofer3">Seleccionar Chofer 3:</label>
+        <select name="chofer3" id="chofer3">
+          {{#each choferes}}
+          <option value="{{this.name}}">{{this.name}} - {{this.type}}</option>
+          {{/each}}
+        </select>
+      </div>
+
+      <!-- Secciones de Productos -->
+      <fieldset>
+        <legend>Compra de envases</legend>
+        <table class="table" id="envasesTable">
+          <thead>
+            <tr>
+              <th>PDV</th>
+              <th>Producto</th>
+              <th>Precio</th>
+              <th>Cantidad</th>
+              <th>Total</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="envase-row" id="envase-row-0">
+              <td>
+                <select name="envases[0][pdv]" class="form-control">
+                  {{#each clientes}}
+                  <option value="{{this.displayName}}">{{this.codigo}} - {{this.razonSocial}}</option>
+                  {{/each}}
+                </select>
+              </td>
+              <td>
+                <select name="envases[0][product]" class="form-control" onchange="updatePrice(0)">
+                  <option value="2730-Q PILAS 1/3" data-price="10000">2730-Q PILAS 1/3</option>
+                  <option value="2731-Q CERVEZAS 1/1" data-price="25600.01">2731-Q CERVEZAS 1/1</option>
+                  <option value="2754-ENV BARR 20L" data-price="30728.52">2754-ENV BARR 20L</option>
+                  <option value="2755-ENV BARR 50L VACIO" data-price="51214.19">2755-ENV BARR 50L VACIO</option>
+                  <option value="2776 BOT 1/1 ARACELI 1000CC" data-price="991.76">2776 BOT 1/1 ARACELI 1000CC</option>
+                  <option value="2780-BOT AMBAR 340 RET" data-price="9600">2780-BOT AMBAR 340 RET</option>
+                  <option value="5192 BOT 2L RECO" data-price="101">5192 BOT 2L RECO X 8</option>
+                </select>
+              </td>
+              <td><input type="number" name="envases[0][price]" class="form-control" value="10000" readonly></td>
+              <td><input type="number" name="envases[0][quantity]" class="form-control quantity" onchange="updateTotal(0)"></td>
+              <td><input type="number" name="envases[0][total]" class="form-control total" readonly></td>
+              <td><button type="button" class="btn btn-danger delete-row">Eliminar</button></td>
+            </tr>
+          </tbody>
+        </table>
+        <button type="button" class="btn btn-primary addRow" data-table="envasesTable">Agregar compra de envases</button>
+      </fieldset>
+
+      <!-- Otras secciones (Roturas, Devoluciones Parciales, etc.) -->
+      <fieldset>
+        <legend>Roturas</legend>
+        <table class="table" id="breaksTable">
+          <thead>
+            <tr>
+              <th>PDV</th>
+              <th>Producto</th>
+              <th>Cantidad</th>
+              <th>Total por Rotura</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="break-row">
+              <td><select name="breaks[0][pdv]" id="breaks-pdv">{{#each clientes}}<option value="{{this.displayName}}">{{this.codigo}} - {{this.razonSocial}}</option>{{/each}}</select></td>
+              <td><input type="text" name="breaks[0][product]" class="form-control"></td>
+              <td><input type="number" name="breaks[0][quantity]" class="form-control quantity"></td>
+              <td><input type="number" name="breaks[0][total]" class="form-control" onchange="calcularTotales()"></td>
+              <td><button type="button" class="btn btn-danger delete-row">Eliminar</button></td>
+            </tr>
+          </tbody>
+        </table>
+        <button type="button" class="btn btn-primary addRow" data-table="breaksTable">Agregar Rotura</button>
+      </fieldset>
+
+      <fieldset>
+        <legend>Devoluciones Parciales</legend>
+        <table class="table" id="partialReturnsTable">
+          <thead>
+            <tr>
+              <th>PDV</th>
+              <th>Producto</th>
+              <th>Cantidad</th>
+              <th>Total por Devolución</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="partial-return-row">
+              <td><select name="partialReturns[0][pdv]" id="partialReturns-pdv">{{#each clientes}}<option value="{{this.displayName}}">{{this.codigo}} - {{this.razonSocial}}</option>{{/each}}</select></td>
+              <td><input type="text" name="partialReturns[0][product]" class="form-control"></td>
+              <td><input type="number" name="partialReturns[0][quantity]" class="form-control quantity"></td>
+              <td><input type="number" name="partialReturns[0][total]" class="form-control" onchange="calcularTotales()"></td>
+              <td><button type="button" class="btn btn-danger delete-row">Eliminar</button></td>
+            </tr>
+          </tbody>
+        </table>
+        <button type="button" class="btn btn-primary addRow" data-table="partialReturnsTable">Agregar Devolución Parcial</button>
+      </fieldset>
+
+      <fieldset>
+        <legend>Devoluciones Totales</legend>
+        <table class="table" id="totalReturnsTable">
+          <thead>
+            <tr>
+              <th>PDV</th>
+              <th>Total Devolución</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="total-return-row">
+              <td><select name="totalReturns[0][pdv]" id="totalReturns-pdv">{{#each clientes}}<option value="{{this.displayName}}">{{this.codigo}} - {{this.razonSocial}}</option>{{/each}}</select></td>
+              <td><input type="number" name="totalReturns[0][total]" class="form-control" onchange="calcularTotales()"></td>
+              <td><button type="button" class="btn btn-danger delete-row">Eliminar</button></td>
+            </tr>
+          </tbody>
+        </table>
+        <button type="button" class="btn btn-primary addRow" data-table="totalReturnsTable">Agregar Devolución Total</button>
+      </fieldset>
+
+      <fieldset>
+        <legend>Productos No Retornables</legend>
+        <table class="table" id="nonReturnableProductsTable">
+          <thead>
+            <tr>
+              <th>Producto</th>
+              <th>Cantidad</th>
+              <th>Total por No Retornable</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="non-returnable-row">
+              <td><input type="text" name="nonReturnable[0][product]" class="form-control"></td>
+              <td><input type="number" name="nonReturnable[0][quantity]" class="form-control quantity"></td>
+              <td><input type="number" name="nonReturnable[0][total]" class="form-control" onchange="calcularTotales()"></td>
+              <td><button type="button" class="btn btn-danger delete-row">Eliminar</button></td>
+            </tr>
+          </tbody>
+        </table>
+        <button type="button" class="btn btn-primary addRow" data-table="nonReturnableProductsTable">Agregar Producto No Retornable</button>
+      </fieldset>
+
+      <!-- Acción de Enviar y Formulario -->
+      <button type="submit" class="btn btn-primary mt-4">Enviar</button>
+    </form>
+  </div>
+   
+
+  <script>
+    // Función para agregar nuevas filas a las tablas
+    $(document).on('click', '.addRow', function () {
+      let tableId = $(this).data('table');
+      let rowClone = $('#' + tableId + ' tbody tr:first').clone();
+      let rowCount = $('#' + tableId + ' tbody tr').length;
+      rowClone.find('input').each(function () {
+        let name = $(this).attr('name');
+        $(this).attr('name', name.replace(/\[\d\]/, '[' + rowCount + ']'));
+        $(this).val('');
+      });
+      $('#' + tableId + ' tbody').append(rowClone);
+      calcularTotales();
+    });
+
+    // Función para eliminar filas de las tablas
+    $(document).on('click', '.delete-row', function () {
+      $(this).closest('tr').remove();
+      calcularTotales();
+    });
+
+
+    // Funciones para calcular los totales por cada tipo de entrada (billetes, devoluciones, etc.)
+    function calcularTotalPorBillete(element) {
+      let row = $(element).closest('tr');
+      let quantity = row.find('.quantity').val();
+      let billValue = row.find('.bill-value').val();
+      let total = quantity * billValue;
+      row.find('input[name$="[total]"]').val(total);
+      calcularTotales();
+    }
+    // Función para calcular total por transferencia
+    function calcularTotalPorTransferencia(inputElement) {
+      const row = inputElement.closest('tr');
+      const quantity = row.querySelector('.quantity').value;
+      const totalInput = row.querySelector('input[name$="[total]"]');
+      totalInput.value = quantity;
+      calcularTotales();
+    }
+
+    function calcularTotalEnvase(element) {
+      let row = $(element).closest('tr');
+      let quantity = row.find('.quantity').val();
+      let productPrice = row.find('input[name$="[total]"]').data('price'); // Asumiendo que tienes un precio por producto
+      let total = quantity * productPrice;
+      row.find('input[name$="[total]"]').val(total);
+      calcularTotales();
+    }
+
+    function calcularTotales() {
+      let total = 0;
+      $('input[name$="[total]"]').each(function () {
+        total += parseFloat($(this).val()) || 0;
+      });
+      $('#total').val(total);
+      calcularDiferencia();
+    }
+
+    function calcularDiferencia() {
+      let total = parseFloat($('#total').val()) || 0;
+      let totalManual = parseFloat($('#totalManual').val()) || 0;
+      $('#diferencia').val(total - totalManual);
+    }
+
+    // Agregar un evento de cambio en todos los inputs de las tablas
+    document.addEventListener('input', function (e) {
+      // Verifica si el input pertenece a las tablas que necesitan ser actualizadas
+      if (e.target.matches('.quantity, .total')) {
+        calcularTotales();
+      }
+    });
+
+let rowCount = 1; // Track the row count for the envases table
+
+    // Function to update the price based on the selected product
+    function updatePrice(rowIndex) {
+      let selectedProduct = $(`#envasesTable tbody tr:eq(${rowIndex}) select[name="envases[${rowIndex}][product]"]`);
+      let price = selectedProduct.find('option:selected').data('price');
+      $(`#envasesTable tbody tr:eq(${rowIndex}) input[name="envases[${rowIndex}][price]"]`).val(price);
+      updateTotal(rowIndex);  // Update the total after setting the price
+    }
+
+    // Function to update the total based on price and quantity
+    function updateTotal(rowIndex) {
+      let price = parseFloat($(`#envasesTable tbody tr:eq(${rowIndex}) input[name="envases[${rowIndex}][price]"]`).val());
+      let quantity = parseFloat($(`#envasesTable tbody tr:eq(${rowIndex}) input[name="envases[${rowIndex}][quantity]"]`).val());
+      let total = price * quantity;
+      $(`#envasesTable tbody tr:eq(${rowIndex}) input[name="envases[${rowIndex}][total]"]`).val(total.toFixed(2));
+    }
+     // Función para agregar nuevas filas a las tablas
+    $(document).on('click', '.addRow', function () {
+      let tableId = $(this).data('table');
+      let rowClone = $('#' + tableId + ' tbody tr:first').clone();
+      let rowCount = $('#' + tableId + ' tbody tr').length;
+      rowClone.find('input').each(function () {
+        let name = $(this).attr('name');
+        $(this).attr('name', name.replace(/\[\d\]/, '[' + rowCount + ']'));
+        $(this).val('');
+      });
+      $('#' + tableId + ' tbody').append(rowClone);
+      calcularTotales();
+    });
+
+    // Function to add a new row
+    $(".addRow").click(function () {
+      let newRow = `
+        <tr class="envase-row" id="envase-row-${rowCount}">
+          <td>
+            <select name="envases[${rowCount}][pdv]" class="form-control">
+              {{#each clientes}}
+                <option value="{{this.displayName}}">{{this.codigo}} - {{this.razonSocial}}</option>
+              {{/each}}
+            </select>
+          </td>
+          <td>
+            <select name="envases[${rowCount}][product]" class="form-control" onchange="updatePrice(${rowCount})">
+              <option value="2730-Q PILAS 1/3" data-price="10000">2730-Q PILAS 1/3</option>
+              <option value="2731-Q CERVEZAS 1/1" data-price="25600.01">2731-Q CERVEZAS 1/1</option>
+              <option value="2754-ENV BARR 20L" data-price="30728.52">2754-ENV BARR 20L</option>
+              <option value="2755-ENV BARR 50L VACIO" data-price="51214.19">2755-ENV BARR 50L VACIO</option>
+              <option value="2776 BOT 1/1 ARACELI 1000CC" data-price="991.76">2776 BOT 1/1 ARACELI 1000CC</option>
+              <option value="2780-BOT AMBAR 340 RET" data-price="9600">2780-BOT AMBAR 340 RET</option>
+              <option value="5192 BOT 2L RECO" data-price="101">5192 BOT 2L RECO X 8</option>
+            </select>
+          </td>
+          <td>
+            <input type="number" name="envases[${rowCount}][price]" class="form-control" value="10000" readonly>
+          </td>
+          <td>
+            <input type="number" name="envases[${rowCount}][quantity]" class="form-control quantity" onchange="updateTotal(${rowCount})">
+          </td>
+          <td>
+            <input type="number" name="envases[${rowCount}][total]" class="form-control total" readonly>
+          </td>
+          <td>
+            <button type="button" class="btn btn-danger delete-row">Eliminar</button>
+          </td>
+        </tr>
+      `;
+      $('#envasesTable tbody').append(newRow);
+      rowCount++;
+    });
+
+    // Function to delete a row
+    $(document).on("click", ".delete-row", function () {
+      $(this).closest('tr').remove();
+    });
+  </script>
+</body>
+
+</html>

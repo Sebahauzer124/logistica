@@ -1,0 +1,164 @@
+/* Estilo general */
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f4f4f4;
+}
+
+/* Asegurar que la estructura se ajuste a la pantalla */
+.container {
+  max-width: 100%;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+/* Hacer que los títulos sean más grandes y adecuados para dispositivos pequeños */
+h1 {
+  font-size: 24px;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* Asegurarse de que los campos de formulario se adapten bien */
+input[type="date"],
+input[type="number"],
+select.form-control {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+/* Mejorar la legibilidad de las tablas */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+table th, table td {
+  padding: 8px;
+  text-align: left;
+  border: 1px solid #ddd;
+}
+
+/* Hacer las tablas más compactas y responsivas */
+@media screen and (max-width: 768px) {
+  table th, table td {
+    padding: 10px;
+    font-size: 12px;
+  }
+  .form-group label {
+    font-size: 14px;
+  }
+  .container {
+    padding: 10px;
+  }
+  h1 {
+    font-size: 20px;
+  }
+  .btn {
+    font-size: 14px;
+    padding: 8px;
+  }
+}
+
+/* Estilo para las filas de las tablas que añaden o eliminan productos */
+.addRow, .delete-row {
+  padding: 6px 10px;
+  font-size: 14px;
+  margin-top: 10px;
+  cursor: pointer;
+}
+
+.delete-row {
+  background-color: #f44336;
+  color: white;
+}
+
+.addRow {
+  background-color: #4CAF50;
+  color: white;
+}
+
+/* Ocultar las tablas en pantallas muy pequeñas y hacerlas en formato de lista */
+@media screen and (max-width: 480px) {
+  table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  table th, table td {
+    display: inline-block;
+    width: auto;
+  }
+
+  .form-group {
+    margin-bottom: 10px;
+  }
+
+  .form-control {
+    padding: 8px;
+  }
+
+  /* Ajustar los tamaños de los títulos y los datos en pantallas pequeñas */
+  h1, legend {
+    font-size: 14px; /* Asegura que sean del mismo tamaño que los campos de formulario */
+  }
+
+  .form-group label {
+    font-size: 14px; /* Asegura que el tamaño de los campos de formulario sea consistente */
+  }
+}
+
+/* Asegurar que los botones estén alineados correctamente */
+.btn-primary {
+  background-color: #007bff;
+  color: white;
+  padding: 12px;
+  border-radius: 5px;
+  display: inline-block;
+  text-align: center;
+  width: 100%;
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  background-color: #0056b3;
+}
+
+/* Estilo para los fieldsets y leyendas */
+fieldset {
+  border: 2px solid #ccc;
+  padding: 15px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+}
+
+legend {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+/* Mejorar la legibilidad de los selectores */
+select {
+  padding: 10px;
+  font-size: 14px;
+}
+
+/* Ajustar tamaño de los botones en dispositivos pequeños */
+@media (max-width: 576px) {
+  .btn {
+    font-size: 14px;
+    width: 100%;
+    padding: 10px;
+  }
+
+  .container {
+    padding: 10px;
+  }
+}
